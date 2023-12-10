@@ -1,0 +1,15 @@
+(
+    max_lightmap_size: 2048,
+    lightmap_pix_per_m: 8.0,
+    fake_ambient: ((0.001, 0.001, 0.001)),
+    max_samples: 3000,
+    min_samples: 25,
+    target_error: 0.01,
+    sun_diam_deg: 0.54,
+    reflectivity_factor: 0.5,
+    indirect_depth: 2,
+    sky_color: ((0.5, 0.5, 0.8)),
+    sky_box: Some("sky_nebula"),
+    filter: true,
+    spherical_harmonics: true,
+)

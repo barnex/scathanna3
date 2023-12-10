@@ -1,0 +1,44 @@
+[package]
+name = "shadowbake"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+bincode = "1"
+clap = { version = "4", features = ["derive", "error-context", "std", "usage"] }
+env_logger = "0.10"
+flate2 = "1"
+fnv = "1"
+image = { version = "0.24", default-features = false, features = [
+	"png",
+	"jpeg",
+] }
+log = "0.4"
+matrix = { path = "../matrix" }
+rand = "0.8"
+rand_distr = "0.4"
+rand_xoshiro = "0.6"
+rayon = "1"
+ron = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+smallvec = { version = "1.9", features = ["serde", "const_generics"] }
+toml = { version = "0.8" }
+vector = { path = "../vector" }
+wavefrontobj = { path = "../wavefrontobj" }
+shadowfields = { path = "../shadowfields" }
+gltf = { version = "1.3", features = [
+	"KHR_lights_punctual",
+	"KHR_materials_emissive_strength",
+	"extras",
+	"import",
+	"names",
+	"utils",
+] }
+itertools = "0.11"
+crossbeam = {version = "0.8.2", features = ["crossbeam-channel"]}
+
+[[bin]]
+name = "shadowbake"
+path = "bin/shadowbake.rs"

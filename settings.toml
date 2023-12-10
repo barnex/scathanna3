@@ -1,0 +1,32 @@
+[network]
+servers = ["127.0.0.1:3344"]
+
+[player]
+name = "Player"
+team = "red"
+avatar = 12
+
+[controls]
+forward = 'w'
+left = 'a'
+backward = 's'
+right = 'd'
+crouch = 'z'
+mouse_sensitivity = 350
+
+[graphics]
+width = 1280
+height = 768
+fullscreen = false
+msaa = true
+anisotropy = 16
+texture_resolution = 256
+normal_maps = true
+mipmaps = true
+trilinear = true
+textures = true
+lightmap_nearest = false
+vsync = true
+
+[sound]
+enabled = true

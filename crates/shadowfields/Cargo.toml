@@ -1,0 +1,61 @@
+[package]
+name = "shadowfields"
+version = "1.0.0"
+edition = "2021"
+
+default-run = "play"
+
+[dependencies]
+anyhow = "1"
+bincode = "1"
+bytemuck = { version = "1.4", features = ["derive"] }
+cgmath = "0.18"
+clap = { version = "4", features = ["derive", "error-context", "std", "usage"] }
+cpal = "0.15"
+env_logger = "0.10"
+flate2 = "1"
+fnv = "1"
+futures = "0.3"
+gltf = { version = "1.3", features = [
+	"names",
+	"extras",
+	"utils",
+	"import",
+	"KHR_lights_punctual",
+] } # TODO: remove
+image = { version = "0.24", default-features = false, features = [
+	"png",
+	"jpeg",
+] }
+itertools = "0.11"
+lewton = "0.10.2"
+log = "0.4"
+matrix = { path = "../matrix" }
+pollster = "0.3"
+rand = "0.8"
+rand_distr = "0.4"
+rand_xoshiro = "0.6"
+rayon = "1"
+ron = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+smallvec = { version = "1.9", features = ["serde", "const_generics"] }
+toml = { version = "0.8" }
+vector = { path = "../vector" }
+wavefrontobj = { path = "../wavefrontobj" }
+wgpu = { version = "0.18", features = [] }
+winit = { version = "0.29", default-features = false, features = [
+	"rwh_05",              # 👈 outdated
+	"wayland",
+	"wayland-csd-adwaita",
+	"wayland-dlopen",
+	"x11",
+] }
+
+[[bin]]
+name = "play"
+path = "bin/play.rs"
+
+[[bin]]
+name = "server"
+path = "bin/server.rs"

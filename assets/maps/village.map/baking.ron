@@ -1,0 +1,13 @@
+(
+    max_lightmap_size: 128,
+    lightmap_pix_per_m: 4.0,
+    fake_ambient: ((0.01, 0.01, 0.01)),
+    max_samples: 30,
+    sun_diam_deg: 2.0,
+    reflectivity_factor: 0.66,
+    indirect_depth: 2,
+    sky_color: ((0.6, 0.6, 0.8)),
+    sky_box: Some("sky2"),
+    target_error: 0.01,
+    spherical_harmonics: false,
+)

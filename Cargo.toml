@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+
+members = [
+	"crates/wavefrontobj",
+	"crates/vector",
+	"crates/matrix",
+	"crates/shadowfields",
+	"crates/shadowbake",
+	"crates/shadowdiff",
+]
+
+
+[profile.release]
+panic = "unwind"
+debug = false
+
+[profile.fast]
+inherits = "dev"
+panic = "unwind"
+debug = true
+lto = "off"
+opt-level = 1
+debug-assertions = true
+overflow-checks = false
+incremental = true
+
+[profile.fast.package."*"]
+inherits = "release"
