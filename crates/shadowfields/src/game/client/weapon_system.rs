@@ -37,10 +37,10 @@ pub(crate) fn control_shooting_(state: &mut Client, player: &mut Player) {
 	let dt = state.dt();
 	let weapon_state = &mut state.weapon_state;
 	weapon_state.cooldown_timer -= dt;
-	if weapon_state.automatic || state.win.inputs.just_pressed(Button::Mouse1) {
+	if weapon_state.automatic || state._win.inputs.just_pressed(Button::Mouse1) {
 		weapon_state.armed = true;
 	}
-	if weapon_state.armed && weapon_state.cooldown_timer <= 0.0 && state.win.inputs.was_pressed(Button::Mouse1) {
+	if weapon_state.armed && weapon_state.cooldown_timer <= 0.0 && state._win.inputs.was_pressed(Button::Mouse1) {
 		weapon_state.cooldown_timer = weapon_state.cooldown_secs;
 		weapon_state.armed = false;
 		shoot(state, player);
@@ -65,7 +65,7 @@ fn shoot(state: &mut Client, player: &Player) {
 
 	state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(
 		must_pick_random(&[handle("bang1"), handle("bang2"), handle("bang3"), handle("bang4")]),
-		player.position(),
+		player._center(),
 		30.0,
 	)));
 	state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(

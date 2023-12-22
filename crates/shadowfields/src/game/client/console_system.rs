@@ -20,7 +20,7 @@ pub(crate) async fn enter_text_input(state: &mut Client) -> Option<String> {
 	let mut cmd = String::new();
 
 	loop {
-		for chr in state.win.inputs.received_characters().chars() {
+		for chr in state._win.inputs.received_characters().chars() {
 			match chr {
 				'\x08' | '\x7f' => drop(cmd.pop()), // backspace (linux, windows | mac)
 				'\r' => return Some(cmd.trim().into()),
@@ -32,12 +32,12 @@ pub(crate) async fn enter_text_input(state: &mut Client) -> Option<String> {
 			}
 		}
 
-		let mut sg = SceneGraph::new(state.win.viewport_size);
+		let mut sg = SceneGraph::new(state._win.viewport_size);
 		draw_cli(&mut sg, &cmd);
 
-		state.win.present_and_wait(sg).await;
+		state.present_and_wait(sg).await;
 
-		if state.win.inputs.just_pressed(Button::Esc) || state.win.inputs.just_pressed(Button::Console) {
+		if state._win.inputs.just_pressed(Button::Esc) || state._win.inputs.just_pressed(Button::Console) {
 			return None;
 		}
 	}

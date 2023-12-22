@@ -4,7 +4,10 @@ use super::internal::*;
 pub(crate) struct Skeleton {
 	pub hsize: f32,
 	pub vsize: f32,
-	pub position: vec3, // center bottom
+	pub target_position: vec3,   // center bottom, not filtered
+	#[serde(skip)]
+	pub pre_filtered_position: vec3, // center bottom,
+	pub filtered_position: vec3, // center bottom,
 	pub velocity: vec3,
 	pub orientation: Orientation,
 }
@@ -15,7 +18,9 @@ pub const GROUND_PROBE_DIST: f32 = 0.05;
 impl Skeleton {
 	pub fn new(pos: vec3, orientation: Orientation, hsize: f32, vsize: f32) -> Self {
 		Self {
-			position: pos,
+			target_position: pos,
+			pre_filtered_position: pos,
+			filtered_position: pos,
 			hsize,
 			vsize,
 			orientation,
@@ -24,14 +29,22 @@ impl Skeleton {
 	}
 
 	pub fn set_frame(&mut self, frame: Frame) {
-		self.position = frame.position;
+		self.target_position = frame.position;
 		self.velocity = frame.velocity;
 		self.orientation = frame.orientation;
 	}
 
-	pub fn frame(&self) -> Frame {
+	pub(crate) fn filtered_frame(&self) -> Frame {
 		Frame {
-			position: self.position,
+			position: self.filtered_position,
+			velocity: self.velocity,
+			orientation: self.orientation,
+		}
+	}
+
+	pub(crate) fn target_frame(&self) -> Frame {
+		Frame {
+			position: self.target_position,
 			velocity: self.velocity,
 			orientation: self.orientation,
 		}
@@ -44,7 +57,7 @@ impl Skeleton {
 		BoundingBox::new(min, max)
 	}
 
-	pub fn bounds(&self) -> BoundingBox<f32> {
-		self.bounds_for(self.position)
+	pub fn filtered_bounds(&self) -> BoundingBox<f32> {
+		self.bounds_for(self.filtered_position)
 	}
 }

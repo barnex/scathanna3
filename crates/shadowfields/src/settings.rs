@@ -52,6 +52,8 @@ pub struct Controls {
 	pub right: char,
 	pub crouch: char,
 	pub mouse_sensitivity: f32,
+	pub mouse_stutter_filter: u8,
+	pub mouse_smoothing: f32,
 }
 
 impl Default for Controls {
@@ -63,6 +65,8 @@ impl Default for Controls {
 			right: 'd',
 			crouch: 'z',
 			mouse_sensitivity: 100.0,
+			mouse_stutter_filter: 1,
+			mouse_smoothing: 0.0,
 		}
 	}
 }
@@ -106,6 +110,7 @@ pub struct DebugOpts {
 	pub bb_overlay: bool,
 	pub axes: bool,
 	pub time_passage: f32,
+	pub monitor_mouse: bool,
 }
 
 impl Default for DebugOpts {
@@ -119,6 +124,7 @@ impl Default for DebugOpts {
 			bb_overlay: default(),
 			axes: default(),
 			time_passage: 1.0,
+			monitor_mouse: false,
 		}
 	}
 }

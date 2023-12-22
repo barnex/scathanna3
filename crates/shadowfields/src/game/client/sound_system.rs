@@ -20,7 +20,7 @@ pub(crate) fn play_sound_spatial(state: &mut Client, clip_name: Handle, volume: 
 		// spatial audio does not work / is pointless when sound location is at or very near player location
 		state.sound_pack.play_raw_volume(clip_name, volume.clamp(0.0, 1.0))
 	} else {
-		let azimuth = azimuth(&player.skeleton.frame(), sound_pos);
+		let azimuth = azimuth(&player.skeleton.filtered_frame(), sound_pos);
 		let distance2 = (ear_pos - sound_pos).len2();
 		let falloff_volume = (volume * (UNIT_DIST * UNIT_DIST) / distance2).clamp(0.0, 1.0);
 		// muffle sound when obstructed by a wall

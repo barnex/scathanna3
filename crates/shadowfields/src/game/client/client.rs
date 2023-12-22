@@ -11,7 +11,7 @@ use super::internal::*;
 ///
 pub(crate) struct Client {
 	pub settings: Settings,
-	pub win: WinitWindow,
+	pub _win: WinitWindow,
 	pub res: Resources,
 	pub sound_pack: SoundPack,
 	pub debug: DebugOpts,
@@ -29,6 +29,10 @@ pub(crate) struct Client {
 	pub local_player_id: ID,
 	pub advantage: bool,
 	pub weapon_state: WeaponState,
+
+	pub mouse_filter: MouseFilter,
+
+	filtered_dt: f32,
 }
 
 impl Client {
@@ -64,9 +68,11 @@ impl Client {
 
 		let hud = HUD::new();
 
+		let mouse_filter = MouseFilter::from_settings(&settings)?;
+
 		let mut client = Client {
 			settings,
-			win,
+			_win: win,
 			hud,
 			conn,
 			res,
@@ -80,6 +86,8 @@ impl Client {
 			advantage: false,
 			weapon_state: default(),
 			sound_pack,
+			mouse_filter,
+			filtered_dt: 0.0,
 		};
 
 		if client.settings.player.advantage {
@@ -91,19 +99,19 @@ impl Client {
 
 	async fn run_human_gameloop(client: &mut Client) -> Result<()> {
 		loop {
-			// 💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀
+			// 💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀
 			// 💀 Systems order is critical                        💀
 			// 💀 Getting it wrong results in subtle added latency 💀
 			// 💀 which is hard to spot but deadly                 💀
-			// 💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀
+			// 💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀💀
 
 			// Loop is cyclical so it does not matter where we start
 			// Arbitrarily start at drawing
 
-			let mut sg = SceneGraph::new(client.win.viewport_size);
+			let mut sg = SceneGraph::new(client._win.viewport_size);
 			draw_gamestate(&mut sg, client);
 			draw_debug_overlay(&mut sg, client);
-			client.win.present_and_wait(sg).await;
+			client.present_and_wait(sg).await;
 			//         👆 this collects the inputs that came in while awaiting the frame
 
 			// 💀 shoot based on what you saw during the last frame
@@ -120,6 +128,9 @@ impl Client {
 
 			// Now update the local player's position, hud, etc.
 			control_player_movement(client);
+
+			smooth_players_movement(&mut client.entities.players);
+
 			jump_pad_system(client);
 			control_respawn(client);
 			console_system(client).await?;
@@ -131,6 +142,11 @@ impl Client {
 		}
 	}
 
+	pub async fn present_and_wait(&mut self, sg: SceneGraph) {
+		self._win.present_and_wait(sg).await;
+		self.filtered_dt = 0.8 * self.filtered_dt + 0.2 * self._win.inputs.tick_time.as_secs_f32() * self.settings.debug.time_passage;
+	}
+
 	pub(crate) async fn bot_pre_tick(client: &mut Client, bot: &Bot) -> Result<()> {
 		console_system(client).await?;
 
@@ -140,6 +156,7 @@ impl Client {
 		control_respawn(client);
 		control_player_movement(client);
 		control_shooting(client);
+		smooth_players_movement(&mut client.entities.players);
 
 		jump_pad_system(client);
 		animate_footsteps(client);
@@ -149,26 +166,27 @@ impl Client {
 
 		client.apply_and_send_diffs()?;
 
-		let mut sg = SceneGraph::new(client.win.viewport_size);
+		let mut sg = SceneGraph::new(client._win.viewport_size);
 		draw_gamestate(&mut sg, client);
 		draw_debug_overlay(&mut sg, client);
 		draw_bot_overlay(&mut sg, client, bot);
 
-		client.win.present_and_wait(sg).await;
+		client.present_and_wait(sg).await;
 
 		Ok(())
 	}
 
 	pub fn dt(&self) -> f32 {
-		self.win.inputs.tick_time.as_secs_f32() * self.settings.debug.time_passage
+		self.filtered_dt
+		//self.win.inputs.tick_time.as_secs_f32() * self.settings.debug.time_passage
 	}
 
 	pub fn inputs(&self) -> &Inputs {
-		&self.win.inputs
+		&self._win.inputs
 	}
 
 	pub fn inputs_mut(&mut self) -> &mut Inputs {
-		&mut self.win.inputs
+		&mut self._win.inputs
 	}
 
 	fn apply_and_send_diffs(&mut self) -> Result<()> {

@@ -11,10 +11,18 @@ pub(crate) fn tick_collisions(state: &mut ServerState) {
 	let collider_ids = state.entities.props.iter().filter_map(|(id, obj)| obj.on_collide.map(|_| id)).copied().collect::<SmallVec<[_; 32]>>();
 
 	for player_id in player_ids {
-		let bb = state.entities.players.get(&player_id).map(|p| p.skeleton.bounds()).unwrap_or(BoundingBox::new(default(), default()));
+		let bb = state
+			.entities
+			.players
+			.get(&player_id)
+			.map(|p| p.skeleton.filtered_bounds())
+			.unwrap_or(BoundingBox::new(default(), default()));
 		for &collider_id in &collider_ids {
 			if let Some(collider_bb) = state.entities.props.get(&collider_id).map(|c| c.bounds()) {
-				if bb.overlaps(&collider_bb) {
+				//if bb.overlaps(&collider_bb) {
+				//	collide_player(state, player_id, collider_id);
+				//}
+				if bb.center().distance_to(collider_bb.center()) < (bb.size().len() + collider_bb.size().len()) / 2.0 {
 					collide_player(state, player_id, collider_id);
 				}
 			}

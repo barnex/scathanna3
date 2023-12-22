@@ -156,7 +156,7 @@ impl ServerState {
 		if let Some(player) = self.entities.players.get_mut(&player_id) {
 			if player.spawned {
 				player.skeleton.set_frame(frame);
-				self.diffs.push(MovePlayer(player_id, player.skeleton.frame()).to_not(player_id));
+				self.diffs.push(MovePlayer(player_id, player.skeleton.target_frame()).to_not(player_id));
 			}
 		}
 	}
@@ -189,7 +189,7 @@ pub(crate) fn handle_ready_to_respawn(state: &mut ServerState, player_id: ID) {
 			trace!("respawn {player_id}");
 			// client could request spawn multiple times in a network race.
 			p.spawned = true;
-			p.skeleton.position = spawn_point.position;
+			p.skeleton.target_position = spawn_point.position;
 			p.skeleton.orientation = spawn_point.orientation();
 		}
 	});

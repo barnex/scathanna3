@@ -88,7 +88,7 @@ pub(crate) fn active_kill(state: &mut ServerState, actor: ID, victim: ID) -> Opt
 
 pub(crate) fn kill(state: &mut ServerState, victim: ID) -> Option<()> {
 	despawn(state, victim)?;
-	add_effect(state, Effect::particle_explosion(player(state, victim)?.center(), handle("star_blue"))); // << todo: color
+	add_effect(state, Effect::particle_explosion(player(state, victim)?._center(), handle("star_blue"))); // << todo: color
 	broadcast_scores(state);
 	state.sprees.remove(&victim);
 	Some(())

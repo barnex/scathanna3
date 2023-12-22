@@ -1,5 +1,13 @@
 use super::internal::*;
 
+pub(crate) fn smooth_players_movement(players: &mut HashMap<ID, Player>) {
+	let a = 0.3;
+	for player in players.values_mut() {
+		player.skeleton.pre_filtered_position = a * player.skeleton.pre_filtered_position + (1.0 - a) * player.skeleton.target_position;
+		player.skeleton.filtered_position = a * player.skeleton.filtered_position + (1.0 - a) * player.skeleton.pre_filtered_position;
+	}
+}
+
 /// Control a player via keyboard/mouse
 pub(crate) fn control_player_movement(state: &mut Client) {
 	let mut clone = state.local_player().clone();
@@ -10,10 +18,14 @@ pub(crate) fn control_player_movement(state: &mut Client) {
 /// Record a diff for controlling this player with keyboard/mouse input.
 /// Called on a clone of the World's player (!so need to be careful for self-interaction!).
 fn control(state: &mut Client, player: &mut Player) {
-	player.set_orientation(&state.inputs(), state.settings.controls.mouse_sensitivity);
+	state.mouse_filter.record_event(state.inputs()._mouse_delta);
+	let mouse_delta = state.mouse_filter.tick();
+	let mouse_sens = 0.00001 * state.settings.controls.mouse_sensitivity;
+	player.skeleton.orientation.yaw = wrap_angle(player.skeleton.orientation.yaw - mouse_delta.x() * mouse_sens);
+	player.skeleton.orientation.pitch = (player.skeleton.orientation.pitch + mouse_delta.y() * mouse_sens).clamp(-89.0 * DEG, 89.0 * DEG);
 	if player.spawned {
 		control_movement(state, player);
-		state.pending_diffs.push(MovePlayerIfSpawned(player.skeleton.frame()));
+		state.pending_diffs.push(MovePlayerIfSpawned(player.skeleton.filtered_frame()));
 	}
 }
 
@@ -123,44 +135,35 @@ fn tick_move_skel(state: &Client, player: &mut Player) {
 		let dy = vec3(0.0, sub_delta_pos.y(), 0.0);
 		let dz = vec3(0.0, 0.0, sub_delta_pos.z());
 
-		if player.pos_ok(map, player.skeleton.position + dx) {
-			player.skeleton.position += dx;
+		if player.pos_ok(map, player.skeleton.target_position + dx) {
+			player.skeleton.target_position += dx;
 		} else {
 			player.bump[X] = true;
 		}
 
-		if player.pos_ok(map, player.skeleton.position + dz) {
-			player.skeleton.position += dz;
+		if player.pos_ok(map, player.skeleton.target_position + dz) {
+			player.skeleton.target_position += dz;
 		} else {
 			player.bump[Z] = true;
 		}
 
-		if player.bump.x() || player.bump.z()  {
-			// && player.skeleton.velocity.y() >= 0.0 // << does not work
+		if player.pos_ok(map, player.skeleton.target_position + dy) {
+			player.skeleton.target_position += dy;
+		} else {
+			player.bump[Y] = true;
+		}
+
+		if player.bump.x() || player.bump.z() {
+			let climb_speed = player.walk_speed;
 			const STAIR_W: f32 = 0.5;
 			const STAIR_H: f32 = 0.6;
 			let step_up = STAIR_W * h_dir + STAIR_H * vec3::EY;
-			let probe_pos = player.skeleton.position + step_up; // what if we kept moving horizontally and took one step up?
-			if player.pos_ok(map, probe_pos) {
-
-				//raysect here	
-
-				player.skeleton.velocity[Y] = player.walk_speed; // <<<<<<<<<<<<<<<<<<<< TODO: angle correctly
-
-			} else {
+			let tiny = climb_speed * dt / (NUM_SUBSTEPS as f32) * vec3::EY;
+			if player.pos_ok(map, player.skeleton.target_position + step_up) {
+				if player.pos_ok(map, player.skeleton.target_position + tiny) {
+					player.skeleton.target_position += tiny
+				}
 			}
-		}
-
-
-		// re-calc dy here after potential stair climb
-		let delta_pos = player.skeleton.velocity * dt;
-		let sub_delta_pos = delta_pos / (NUM_SUBSTEPS as f32);
-		let dy = vec3(0.0, sub_delta_pos.y(), 0.0);
-
-		if player.pos_ok(map, player.skeleton.position + dy) {
-			player.skeleton.position += dy;
-		} else {
-			player.bump[Y] = true;
 		}
 	}
 
@@ -171,8 +174,8 @@ fn tick_move_skel(state: &Client, player: &mut Player) {
 
 fn tick_rescue(state: &Client, player: &mut Player) {
 	let stairclimb_speed = player.walk_speed * 1.2; // TODO
-	if !player.pos_ok(&state.map, player.position()) {
-		player.skeleton.position[Y] += stairclimb_speed * state.dt();
+	if !player.pos_ok(&state.map, player.skeleton.target_position) {
+		player.skeleton.target_position[Y] += stairclimb_speed * state.dt();
 	}
 }
 

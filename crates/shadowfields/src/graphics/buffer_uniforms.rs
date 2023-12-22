@@ -65,7 +65,7 @@ impl GlobalsBuffer {
 			entries: &[wgpu::BindGroupLayoutEntry {
 				binding: 0,
 				visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
-				/// <<<<<<<<<<<<<<<  ????????????? just VERTEX?
+				// <<<<<<<<<<<<<<<  ????????????? just VERTEX?
 				ty: wgpu::BindingType::Buffer {
 					ty: wgpu::BufferBindingType::Uniform,
 					has_dynamic_offset: false,

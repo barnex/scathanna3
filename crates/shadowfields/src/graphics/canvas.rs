@@ -178,11 +178,7 @@ impl Canvas {
 						render_pass.set_bind_group(0, texture_bindings, &[]);
 					}
 					Lines(texture_bindings) => {
-						render_pass.set_pipeline(&shaders.flat_lines_pipeline.pipeline);
-						render_pass.set_bind_group(0, texture_bindings, &[]);
-					}
-					Highlight(texture_bindings) => {
-						render_pass.set_pipeline(&shaders.highlight_pipeline.pipeline);
+						render_pass.set_pipeline(&shaders.flat_texture_pipeline.pipeline);
 						render_pass.set_bind_group(0, texture_bindings, &[]);
 					}
 					Lightmap(texture_bindings) => {
@@ -281,7 +277,6 @@ impl Canvas {
 				Sph(_) => (),
 				Normalmap(_) => (),
 				Text(_) => (),
-				Highlight(_) => (),
 			}
 		}
 

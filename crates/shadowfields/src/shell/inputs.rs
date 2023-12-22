@@ -15,7 +15,7 @@ pub(crate) struct Inputs {
 	pub buttons_pressed: Set<Button>,
 	pub buttons_released: Set<Button>,
 	pub received_characters: String,
-	pub mouse_delta: ivec2,
+	pub _mouse_delta: vec2,
 	pub tick_time: Duration, // ??????????????????????????
 }
 
@@ -53,7 +53,7 @@ impl Inputs {
 		self.buttons_pressed.clear();
 		self.buttons_released.clear();
 		self.received_characters.clear();
-		self.mouse_delta = default();
+		self._mouse_delta = default();
 	}
 
 	/// Record that an event happened since the last `forget` call
@@ -72,8 +72,10 @@ impl Inputs {
 				},
 				..
 			} => {
-				if let Some(text) = text {
-					self.received_characters.push_str(text);
+				if state == &ElementState::Pressed {
+					if let Some(text) = text {
+						self.received_characters.push_str(text);
+					}
 				}
 				if let Some(button) = keymap.map(logical_key) {
 					self.record_button(button, *state)
@@ -96,8 +98,8 @@ impl Inputs {
 	/// and presented as a single motion.
 	/// (Called by the event loop, not to be called by the event consumer (i.e. App)).
 	pub fn record_mouse_motion(&mut self, delta: dvec2) {
-		let delta = delta.convert::<i32>();
-		self.mouse_delta += delta;
+		let delta = delta.convert::<f32>();
+		self._mouse_delta += delta;
 	}
 
 	/// Record a key or mouse button event (handled uniformly).
@@ -200,11 +202,6 @@ impl Inputs {
 		self.buttons_pressed.iter().next().copied()
 	}
 
-	/// The relative mouse movement since the last tick.
-	pub fn mouse_delta(&self) -> vec2 {
-		self.mouse_delta.convert()
-	}
-
 	/// The relative mouse wheel movement since last tick.
 	pub fn mouse_wheel_delta(&self) -> i32 {
 		let mut delta = 0;
@@ -227,7 +224,7 @@ impl Inputs {
 	pub fn tick(&mut self) {
 		self.buttons_pressed.clear();
 		self.buttons_released.clear();
-		self.mouse_delta = ivec2(0, 0);
+		self._mouse_delta = vec2::ZERO;
 		self.received_characters.clear();
 		self.tick_time = Duration::ZERO;
 	}

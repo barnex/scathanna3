@@ -215,14 +215,14 @@ fn draw_player_3d_person_morphed(sg: &mut SceneGraph, state: &Client, player: &P
 	let entities = &state.entities;
 	let res = &state.res;
 	let ctx = ctx();
-	let bounds = player.skeleton.bounds();
+	let bounds = player.skeleton.filtered_bounds();
 	let lightbox = state.map.volumetric_light_cache.lightbox_for(&state.map, &bounds);
 	let avatar = player.avatar_id;
 
 	// Body
 	{
 		let matrix = translation_matrix(player.position()) //.
-			* yaw_matrix(180.8*DEG /*BLENDER HACK*/-player.skeleton.frame().orientation.yaw) //.
+			* yaw_matrix(180.8*DEG /*BLENDER HACK*/-player.skeleton.filtered_frame().orientation.yaw) //.
 			* scale_matrix(player.torso_size.y()); // <<<< TODO
 		let feet_phase = entities.animation_state.get(&player.id).cloned().unwrap_or_default().feet_phase; // TODO: phase = 0..1.
 		let t = 0.5 * (feet_phase / PI) + 0.5;
@@ -235,11 +235,11 @@ fn draw_player_3d_person_morphed(sg: &mut SceneGraph, state: &Client, player: &P
 	{
 		let head = res.vaos.load_sync(head_for_avatar_id(avatar))?;
 		let matrix = translation_matrix(player.position() + vec3::EY * (0.98 * player.torso_size.y() /*NECK HACK*/)) //.
-				* yaw_matrix(180.0*DEG /*BLENDER HACK*/-player.skeleton.frame().orientation.yaw) //.
+				* yaw_matrix(180.0*DEG /*BLENDER HACK*/-player.skeleton.filtered_frame().orientation.yaw) //.
 				* pitch_matrix(-0.4 * player.orientation().pitch)
 				* scale_matrix(player.head_size.y());
 		let tex = res.textures.load_sync(texture_for_avatar(avatar, player.team))?;
-		sg.push(Object::new(head, ctx.shader_pack.entity(&tex, matrix, &player.skeleton.bounds(), &lightbox)));
+		sg.push(Object::new(head, ctx.shader_pack.entity(&tex, matrix, &player.skeleton.filtered_bounds(), &lightbox)));
 	}
 	Some(())
 }
@@ -247,12 +247,12 @@ fn draw_player_3d_person_morphed(sg: &mut SceneGraph, state: &Client, player: &P
 /// Draw an avatar made up from loose parts (separate head & feet meshes, like "frog.obj", "frog_foot.obj").
 fn draw_player_3d_person_parts(sg: &mut SceneGraph, state: &Client, player: &Player) -> Option<()> {
 	let ctx = ctx();
-	let bounds = player.skeleton.bounds();
+	let bounds = player.skeleton.filtered_bounds();
 	let lightbox = state.map.volumetric_light_cache.lightbox_for(&state.map, &bounds);
 
 	let tex = state.res.textures.load_sync(texture_for_avatar(player.avatar_id, player.team))?;
 
-	let yaw = yaw_matrix(180.0*DEG /*BLENDER HACK*/-player.skeleton.frame().orientation.yaw);
+	let yaw = yaw_matrix(180.0*DEG /*BLENDER HACK*/-player.skeleton.filtered_frame().orientation.yaw);
 
 	// Head
 	{

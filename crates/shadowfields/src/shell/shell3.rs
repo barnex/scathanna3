@@ -23,7 +23,7 @@ pub(crate) struct Shell3 {
 
 impl Shell3 {
 	pub fn run(settings: Settings) -> Result<()> {
-		LOG.write(" >> Welcome to Scathanna 3.0 << ");
+		LOG.write(" >> Welcome to Scathanna 3.2 << ");
 
 		#[cfg(debug_assertions)]
 		LOG.write(DEBUG_WARNING);
@@ -38,7 +38,7 @@ impl Shell3 {
 				height: settings.graphics.height,
 			})
 			.with_fullscreen(settings.graphics.fullscreen.then(|| winit::window::Fullscreen::Borderless(None)))
-			.with_title("Scathanna 3.0")
+			.with_title("Scathanna 3.2")
 			.build(&event_loop)?;
 
 		let canvas = Canvas::new(&settings.graphics, &window)?;
@@ -87,39 +87,39 @@ impl Shell3 {
 							WindowEvent::Focused(false) => self.release_cursor(),
 							WindowEvent::CloseRequested | WindowEvent::Destroyed => elwt.exit(),
 							WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => self.handle_resize(),
-							WindowEvent::RedrawRequested => {
-								self.update_dt(); // 👈
-								profiler.start_new_frame(self.previous_tick /* just set by update_dt */, self.inputs.tick_time.as_secs_f32());
-
-								//                      👇
-								match gameloop.as_mut().poll(&mut noop_cx) {
-									Poll::Ready(Ok(())) => elwt.exit(), // gameloop done
-									Poll::Ready(Err(e)) => {
-										eprintln!("gameloop exited: {e:#}"); // 👈 TODO: take back to main menu or so
-										elwt.exit()
-									}
-									Poll::Pending => (),
-								}
-								profiler.gameloop_polled();
-
-								match self.mailbox.get() {
-									WinitMailboxInner::RequestRender(sg) => {
-										self.canvas.render(&sg);
-										profiler.rendered();
-										// TODO: could gather more inputs here (anti-lag)?
-										self.mailbox.set(WinitMailboxInner::RequestTick(TickRequest {
-											inputs: self.inputs.clone(),
-											viewport_size: self.canvas.viewport_size(),
-										}));
-									}
-									WinitMailboxInner::RequestTick(_) => (),
-								};
-
-								self.inputs.tick(); // 👈
-								self.window.request_redraw(); // 👈 continuously redraw
-							}
 							_ => (),
 						};
+					}
+					Event::AboutToWait => { // ????????????????????????
+						self.update_dt(); // 👈
+						profiler.start_new_frame(self.previous_tick /* just set by update_dt */, self.inputs.tick_time.as_secs_f32());
+
+						//                      👇
+						match gameloop.as_mut().poll(&mut noop_cx) {
+							Poll::Ready(Ok(())) => elwt.exit(), // gameloop done
+							Poll::Ready(Err(e)) => {
+								eprintln!("gameloop exited: {e:#}"); // 👈 TODO: take back to main menu or so
+								elwt.exit()
+							}
+							Poll::Pending => (),
+						}
+						profiler.gameloop_polled();
+
+						match self.mailbox.get() {
+							WinitMailboxInner::RequestRender(sg) => {
+								self.canvas.render(&sg);
+								profiler.rendered();
+								// TODO: could gather more inputs here (anti-lag)?
+								self.mailbox.set(WinitMailboxInner::RequestTick(TickRequest {
+									inputs: self.inputs.clone(),
+									viewport_size: self.canvas.viewport_size(),
+								}));
+							}
+							WinitMailboxInner::RequestTick(_) => (),
+						};
+
+						self.inputs.tick(); // 👈
+						self.window.request_redraw(); // 👈 continuously redraw
 					}
 					Event::DeviceEvent { event, .. } => {
 						match event {
@@ -174,7 +174,7 @@ impl Shell3 {
 
 	/// Update the current time step, in preparation of a new `tick` call.
 	fn update_dt(&mut self) {
-		const MIN_DT: Duration = Duration::from_millis(1);
+		const MIN_DT: Duration = Duration::from_millis(4);
 		const MAX_DT: Duration = Duration::from_millis(100);
 		let now = Instant::now();
 		self.inputs.tick_time = (now - self.previous_tick).clamp(MIN_DT, MAX_DT);
@@ -187,6 +187,7 @@ impl Shell3 {
 		if !size.iter().all(|v| v > 0 && v < 16384) {
 			return log::error!("resize: invalid viewport size: {size}");
 		}
+		log::info!("window scale factor: {}", self.window.scale_factor());
 		if size != self.canvas.viewport_size() {
 			self.canvas.resize(size);
 			self.window.request_redraw();

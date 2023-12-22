@@ -45,10 +45,11 @@ where
 pub(crate) fn fmt_dbg_overlay(state: &Client) -> String {
 	let player = state.local_player();
 	let spawned = player.spawned;
-	let position = player.skeleton.position;
+	let target_position = player.skeleton.target_position;
+	let filtered_position = player.skeleton.filtered_position;
 	let look_dir = player.skeleton.orientation.look_dir();
 	let on_ground = player.on_ground(&state.map);
-	let velocity = player.skeleton.velocity.0.map(|v|format!("{:+.5}", v));
+	let velocity = player.skeleton.velocity.0.map(|v| format!("{:+.5}", v));
 	let bump = player.bump;
 
 	let mut extra = String::new();
@@ -59,7 +60,8 @@ pub(crate) fn fmt_dbg_overlay(state: &Client) -> String {
 	format!(
 		r#"
 spawned: {spawned}
-position: {position}
+filtered_position: {filtered_position}
+targert_position: {target_position}
 velocity: {velocity:?}
 look_dir: {look_dir}
 bump: {bump}

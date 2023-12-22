@@ -5,7 +5,7 @@ pub(crate) fn jump_pad_system(state: &mut Client) {
 	//control(state, &mut clone);
 	//*state.local_player_mut() = clone;
 
-	let player_bounds = state.local_player().skeleton.bounds();
+	let player_bounds = state.local_player().skeleton.filtered_bounds();
 
 	for pad in &state.map.jump_pads {
 		if player_bounds.overlaps(&pad.bounds) {

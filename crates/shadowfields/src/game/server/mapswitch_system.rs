@@ -42,9 +42,7 @@ pub(crate) fn switch_map(state: &mut ServerState, map_name: &str) {
 
 			// Keep players, remove other entities
 
-			//let mut players_backup = default();
-			//mem::swap(&mut self.0.entities.players, &mut players_backup);
-			//self.0.entities = Entities::default().with(|e| e.players = players_backup);
+			state.entities.props.clear();
 
 			state.diffs.push(
 				SwitchMap(MapSwitch {

@@ -5,7 +5,9 @@ pub(crate) fn exec_command(state: &mut Client, cmd: &str) -> Result<()> {
 		["head_size", v] => set("player.head_size.y", &mut state.local_player_mut().head_size[1], v),
 		["torso_size", v] => set("player.torso_size.y", &mut state.local_player_mut().torso_size[1], v),
 
-		["ms" | "mouse_sens" | "mouse_sensitivity", v] => set("mouse_sensitivity", &mut state.settings.controls.mouse_sensitivity, v),
+		["ms" | "mouse_sensitivity", v] => set("mouse_sensitivity", &mut state.settings.controls.mouse_sensitivity, v),
+		["stutter_filter", v] => set("stutter_filter", &mut state.mouse_filter.stutter_filter, v),
+		["mouse_smoothing", v] => set("mouse_smoothing", &mut state.mouse_filter.smoothing, v),
 
 		["timepassage", v] => Ok(state.settings.debug.time_passage = v.parse()?),
 		["fly"] => flip(&mut state.local_player_mut().flying),

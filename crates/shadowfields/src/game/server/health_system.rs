@@ -66,9 +66,7 @@ pub(crate) fn tick_health(state: &mut ServerState) {
 			health.shield -= dt * health.shield_discharge_rate
 		}
 
-		if health.shield > 500.0{
-			health.shield = 500.0; // max
-		}
+		health.shield = health.shield.clamp(0.0, 500.0 /*max*/);
 	}
 }
 

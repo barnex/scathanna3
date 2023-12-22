@@ -50,11 +50,14 @@ fn handle_move_player(state: &mut Client, player_id: ID, frame: Frame) {
 
 fn handle_apply_impulse(state: &mut Client, delta_v: vec3) {
 	state.local_player_mut().skeleton.velocity += delta_v;
-	state.local_player_mut().skeleton.position[1] += 0.1; // 👈 tiny jump to get you airborne
+	let jump = 0.05 * vec3::EY;
+	if state.local_player().pos_ok(&state.map, state.local_player().skeleton.target_position + jump) {
+		state.local_player_mut().skeleton.target_position += jump; // 👈 tiny jump to get you airborne
+	}
 }
 
 fn handle_force_move_player(state: &mut Client, position: vec3) {
-	state.local_player_mut().skeleton.position = position;
+	state.local_player_mut().skeleton.target_position = position;
 }
 
 // Update part of player state controlled by server: everything except frame.
@@ -62,7 +65,7 @@ fn handle_force_move_player(state: &mut Client, position: vec3) {
 fn handle_update_player_partial(state: &mut Client, new: Player) {
 	if let Some(old) = state.entities.players.get_mut(&new.id) {
 		let mut new = new;
-		new.skeleton.set_frame(old.skeleton.frame());
+		new.skeleton.set_frame(old.skeleton.target_frame());
 		*old = new;
 	}
 }

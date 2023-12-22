@@ -68,6 +68,18 @@ struct PlayFlags {
 	#[arg(long)]
 	profile: Option<bool>,
 
+	/// Override mouse_stutter_filter (from settings.toml): 0(off), 1(minimal), or 2(full).
+	#[arg(long)]
+	mouse_stutter_filter: Option<u8>,
+
+	/// Override mouse smoothing (from settings.toml): 0.0 .. 0.9.
+	#[arg(long)]
+	mouse_smoothing: Option<f32>,
+
+	/// Write mouse position to mouse.txt (overrides settings.toml).
+	#[arg(long)]
+	monitor_mouse: Option<bool>,
+
 	/// Player is a bot
 	#[arg(long)]
 	bot: Option<bool>,
@@ -91,6 +103,8 @@ fn override_play_settings(mut settings: Settings, flags: PlayFlags) -> Settings 
 	}
 
 	flag_override(&mut settings.controls.mouse_sensitivity, flags.mouse_sensitivity);
+	flag_override(&mut settings.controls.mouse_stutter_filter, flags.mouse_stutter_filter);
+	flag_override(&mut settings.controls.mouse_smoothing, flags.mouse_smoothing);
 	flag_override(&mut settings.graphics.anisotropy, flags.anisotropy);
 	flag_override(&mut settings.graphics.fullscreen, flags.fullscreen);
 	flag_override(&mut settings.graphics.lightmap_nearest, flags.lightmap_nearest);
@@ -104,7 +118,7 @@ fn override_play_settings(mut settings: Settings, flags: PlayFlags) -> Settings 
 	flag_override(&mut settings.sound.enabled, flags.sound);
 	flag_override(&mut settings.debug.fps_overlay, flags.fps);
 	flag_override(&mut settings.debug.profile, flags.profile);
+	flag_override(&mut settings.debug.monitor_mouse, flags.monitor_mouse);
 	flag_override(&mut settings.bot.enabled, flags.bot);
-
 	settings
 }

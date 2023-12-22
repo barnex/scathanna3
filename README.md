@@ -9,7 +9,7 @@ Tested on Linux, Mac and Windows.
 Make sure you have Rust installed from [rustup.rs](http://rustup.rs). Then run:
 
 ```
-git clone git@github.com:barnex/scathanna3
+git clone https://github.com/barnex/scathanna3
 cd scathanna3
 
 cargo run --release --bin server &
@@ -20,9 +20,11 @@ Linux only: install dependencies first(example for Ubuntu):
 
 ```
 sudo apt install \
-	libfontconfig-dev
-	cmake
-	libasound2-dev
+	build-essential \
+	pkg-config \
+	cmake \
+	libasound2-dev \
+	libfontconfig-dev \
 ```
 
 ## Settings

@@ -67,30 +67,34 @@ impl Player {
 	// __________________________________________________________________________________ control
 
 	pub fn on_ground(&self, map: &Map) -> bool {
-		!self.pos_ok(map, self.skeleton.position - vec3(0.0, GROUND_PROBE_DIST, 0.0))
+		!self.pos_ok(map, self.skeleton.target_position - vec3(0.0, GROUND_PROBE_DIST, 0.0))
 	}
 
 	/// TODO
-	pub fn set_orientation(&mut self, inputs: &Inputs, sens: f32) {
-		let mouse_sens = 0.00001 * sens;
-		self.skeleton.orientation.yaw = wrap_angle(self.skeleton.orientation.yaw - inputs.mouse_delta().x() * mouse_sens);
-		self.skeleton.orientation.pitch = (self.skeleton.orientation.pitch + inputs.mouse_delta().y() * mouse_sens).clamp(-89.0 * DEG, 89.0 * DEG);
-	}
+	//pub fn set_orientation(&mut self, inputs: &Inputs, sens: f32) {
+	//	let mouse_sens = 0.00001 * sens;
+	//	self.skeleton.orientation.yaw = wrap_angle(self.skeleton.orientation.yaw - inputs.mouse_delta().x() * mouse_sens);
+	//	self.skeleton.orientation.pitch = (self.skeleton.orientation.pitch + inputs.mouse_delta().y() * mouse_sens).clamp(-89.0 * DEG, 89.0 * DEG);
+
+	//	//let a = 0.8;
+	//	//self.skeleton.filtered_orientation.yaw = a * self.skeleton.filtered_orientation.yaw + (1.0 - a) * self.skeleton.orientation.yaw;
+	//	//self.skeleton.filtered_orientation.pitch = a * self.skeleton.filtered_orientation.pitch + (1.0 - a) * self.skeleton.orientation.pitch;
+	//}
 
 	// __________________________________________________________________________________ accessors
 
 	/// Center-bottom position of the bounding box.
 	pub fn position(&self) -> vec3 {
-		self.skeleton.position
+		self.skeleton.filtered_position
 	}
 
 	/// Position right beneath player, used to check what they're standing on.
 	pub fn ground_probe(&self) -> vec3 {
-		self.skeleton.position - GROUND_PROBE_DIST * vec3::EY
+		self.skeleton.target_position - GROUND_PROBE_DIST * vec3::EY
 	}
 
-	pub fn center(&self) -> vec3 {
-		self.skeleton.bounds().center()
+	pub fn _center(&self) -> vec3 {
+		self.skeleton.filtered_bounds().center()
 	}
 
 	pub fn orientation(&self) -> Orientation {
@@ -104,8 +108,10 @@ impl Player {
 
 	pub fn camera(&self) -> Camera {
 		Camera::default().with(|c| {
-			c.position = self.position() + vec3(0.0, self.cam_height, 0.0);
+			c.position = self.skeleton.filtered_position + vec3(0.0, self.cam_height, 0.0);
 			c.orientation = self.orientation();
+			//c.orientation = self.skeleton.filtered_orientation;
+			//TODO: mouse filter option + winit: poll twice
 		})
 	}
 
@@ -113,7 +119,7 @@ impl Player {
 	pub fn intersect(&self, ray: &Ray64) -> Option<f64> {
 		// Cannot get hit if not spawned.
 		match self.spawned {
-			true => self.skeleton.bounds().convert::<f64>().intersect(ray),
+			true => self.skeleton.filtered_bounds().convert::<f64>().intersect(ray),
 			false => None,
 		}
 	}

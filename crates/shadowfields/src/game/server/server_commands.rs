@@ -32,7 +32,7 @@ fn server_command_with_result(state: &mut ServerState, client_id: ID, cmd: Strin
 fn summon_cmd(state: &mut ServerState, client_id: ID, handle: &str) -> Result<()> {
 	const DIST_FROM_PLAYER: f32 = 2.0;
 	let player = player(state, client_id).ok_or_else(noexist)?;
-	let position = player.position() + DIST_FROM_PLAYER * player.skeleton.frame().orientation.look_dir_h();
+	let position = player.position() + DIST_FROM_PLAYER * player.skeleton.filtered_frame().orientation.look_dir_h();
 	let mut gobj = Prop::from_str(handle)?;
 	gobj.transform.translation = position;
 	state.spawn_game_object(gobj);

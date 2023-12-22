@@ -10,7 +10,6 @@ pub(crate) enum Shader {
 	Normalmap(Arc<wgpu::BindGroup>),
 	Sph(Arc<wgpu::BindGroup>),
 	Text(Arc<wgpu::BindGroup>),
-	Highlight(Arc<wgpu::BindGroup>),
 	Entity(Arc<wgpu::BindGroup>, InstanceData),
 	Particles(Arc<wgpu::BindGroup>, InstanceData),
 	Debris(Arc<wgpu::BindGroup>, InstanceData),

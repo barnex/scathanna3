@@ -2,22 +2,53 @@
 servers = ["127.0.0.1:3344"]
 
 [player]
+# Change your name and preferred team here.
 name = "Player"
 team = "red"
+# Choose your avatar here.
+# 1-10: cute animals
+# 11: witch
+# 12: wizard
 avatar = 12
 
 [controls]
+# Set your keyboard controls here
+# (arrow keys always work for player movement, too).
 forward = 'w'
 left = 'a'
 backward = 's'
 right = 'd'
 crouch = 'z'
-mouse_sensitivity = 350
+
+# Set your mouse sensitivity here (percentage, default 100).
+# You can try it out in-game first by hitting TAB (enters console),
+# and typing, e.g., "ms 230" (to set sensitivity to 230%).
+# Then put the value in your settings.toml if satisfied.
+mouse_sensitivity = 100
+
+# Filter mouse stutter caused by late mouse events.
+# This appears needed on many systems except when using a gaming mouse with 
+# with high-frequency polling and proper driver. 
+#  0: disabled
+#  1: minimal filtering, causes virtually no lag except 1 frame right after the mouse stopped moving.
+#  2: consistent 1-frame delay
+# Can also be changed in-game by pressing TAB to enter console, typing "stutter_filter 2".
+mouse_stutter_filter = 1
+
+# Additional mouse smoothing, useful for low-DPI or bluetooth mice.
+# You can probalby turn this off if you have a gaming mouse (and corresponding driver!).
+#  0.0: off
+#  0.5: minimal
+#  1.0: balanced, small ~1 frame delay
+#  2.0: very smooth, noticable delay, only needed for very gaming-unfriendly mice
+# Can also be changed in-game by pressing TAB to enter console, typing, e.g., "mouse_smoothing 1.0".
+mouse_smoothing = 1.0
 
 [graphics]
+fullscreen = false
+vsync = true
 width = 1280
 height = 768
-fullscreen = false
 msaa = true
 anisotropy = 16
 texture_resolution = 256
@@ -26,7 +57,6 @@ mipmaps = true
 trilinear = true
 textures = true
 lightmap_nearest = false
-vsync = true
 
 [sound]
 enabled = true

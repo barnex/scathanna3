@@ -55,9 +55,18 @@ impl NetServer {
 	fn tick(&mut self) -> Result<()> {
 		self.tick_listen()?;
 		self.tick_client_msgs()?;
+			Self::smooth_players_movement(&mut self.state.entities.players);
 		let diffs = self.state.handle_tick(self.tick_duration.as_secs_f32());
 		self.flush_diffs(diffs);
 		Ok(())
+	}
+
+	fn smooth_players_movement(players: &mut HashMap<ID, Player>){
+		// Server does not require smooth movement,
+		// but does need to sync filtered position (e.g. for collision detection)
+		for player in players.values_mut(){
+			player.skeleton.filtered_position = player.skeleton.target_position;
+		}
 	}
 
 	//-------------------------------------------------------------------------------- accept new clients
