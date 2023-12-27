@@ -102,7 +102,7 @@ fn save_occupancy(map_dir: &MapDir, occupancy: &HashMap<Handle, Img<Accum>>) -> 
 fn save_lightmap_with_debug(map_dir: &MapDir, infix: &str, lm_name: &Handle, lightmap: &Img<Accum>) -> Result<()> {
 	// 🪲 TODO: Don't save stderr for validity, occupancy
 
-	save_image(&map_dir.lm_file(infix, lm_name.as_str()), &unweigh_or_red(&lightmap).to_srgb())?;
+	save_image(&map_dir.lm_file(infix, lm_name.as_str()), &unweigh(&lightmap).to_srgb())?;
 
 	if false {
 		// <<<< disbling debug output
@@ -193,11 +193,47 @@ fn clean_map_dir(map_dir: &MapDir) -> Result<()> {
 }
 
 // divide colors by number of samples. zero samples => red (for debug).
-fn unweigh_or_red(img: &Img<Accum>) -> Img<vec3> {
+fn _unweigh_or_red(img: &Img<Accum>) -> Img<vec3> {
 	img.map(|weighted| weighted.avg().unwrap_or(RED))
 }
 
 // divide colors by number of samples. zero samples => black.
-pub(crate) fn unweigh_or_black(img: &Img<Accum>) -> Img<vec3> {
+pub(crate) fn _unweigh_or_black(img: &Img<Accum>) -> Img<vec3> {
 	img.map(|weighted| weighted.avg().unwrap_or_default())
+}
+
+
+// divide colors by number of samples. zero samples => black.
+pub(crate) fn unweigh(img: &Img<Accum>) -> Img<vec3> {
+	leak_filter(&img.map(|weighted| weighted.avg())).map(|v|v.unwrap_or(vec3::ZERO))
+}
+
+fn leak_filter(img: &Img<Option<vec3>>) -> Img<Option<vec3>> {
+	let mut result = Img::new(img.size());
+
+	let (w, h) = img.size().into();
+	for dst_idx in cross(0..w, 0..h) {
+		let dst_idx = uvec2::from(dst_idx);
+		let (w, h) = (w as i32, h as i32);
+		result.set(dst_idx, img.at(dst_idx));
+		if img.at(dst_idx).is_none() {
+			let mut n = 0;
+			let mut sum = vec3::ZERO;
+			for delta in cross(-1..=1, -1..=1) {
+				let delta = ivec2::from(delta);
+				let src_idx = dst_idx.convert() + delta;
+				if src_idx.x() >= 0 && src_idx.x() < w && src_idx.y() >= 0 && src_idx.y() < h {
+					if let Some(c) = img.at(src_idx.map(|v| v as u32)) {
+						n += 1;
+						sum += c;
+					}
+				}
+			}
+			if n != 0 {
+				result.set(dst_idx, Some(sum / (n as f32)));
+			}
+		}
+	}
+
+	result
 }

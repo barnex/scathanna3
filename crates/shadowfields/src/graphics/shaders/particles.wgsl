@@ -26,7 +26,7 @@ fn vs_main(model: VertexInput, @builtin(instance_index) inst_idx: u32) -> Vertex
     var out: VertexOutput;
     out.tex_coords = model.tex_coords;
     var world_pos = (model_matrix * vec4(model.position + t * model.velocity, 1.0));
-    world_pos.y -= 3.0 * t * t; // hard-coded gravity
+    world_pos.y -= 2.0 * t * t; // hard-coded gravity
     out.clip_position = globals.view_proj * world_pos;
 
 	// hack to discard triangle

@@ -6,7 +6,7 @@
     reflectivity_factor: 0.7,
     sun_diam_deg: 3.0,
     sky_box: Some("sky2"),
-    spherical_harmonics: false,
+    spherical_harmonics: true,
     indirect_depth: 2,
     max_samples: 3000,
 )

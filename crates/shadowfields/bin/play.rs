@@ -46,6 +46,10 @@ struct PlayFlags {
 
 	/// Overrides settings.toml
 	#[arg(long)]
+	shadows: Option<bool>,
+
+	/// Overrides settings.toml
+	#[arg(long)]
 	anisotropy: Option<u8>,
 
 	/// Overrides settings.toml
@@ -59,6 +63,10 @@ struct PlayFlags {
 	/// Force disable sound (overrides settings.toml).
 	#[arg(long)]
 	sound: Option<bool>,
+
+	/// Force disable music (overrides settings.toml).
+	#[arg(long)]
+	music: Option<bool>,
 
 	/// Show frames per second (overrides settings.toml).
 	#[arg(long)]
@@ -109,6 +117,7 @@ fn override_play_settings(mut settings: Settings, flags: PlayFlags) -> Settings 
 	flag_override(&mut settings.graphics.fullscreen, flags.fullscreen);
 	flag_override(&mut settings.graphics.lightmap_nearest, flags.lightmap_nearest);
 	flag_override(&mut settings.graphics.msaa, flags.msaa);
+	flag_override(&mut settings.graphics.shadows, flags.shadows);
 	flag_override(&mut settings.graphics.normal_maps, flags.normal_maps);
 	flag_override(&mut settings.graphics.textures, flags.textures);
 	flag_override(&mut settings.graphics.vsync, flags.vsync);
@@ -116,6 +125,7 @@ fn override_play_settings(mut settings: Settings, flags: PlayFlags) -> Settings 
 	flag_override(&mut settings.player.team, flags.team);
 	flag_override(&mut settings.player.avatar, flags.avatar);
 	flag_override(&mut settings.sound.enabled, flags.sound);
+	flag_override(&mut settings.sound.music, flags.music);
 	flag_override(&mut settings.debug.fps_overlay, flags.fps);
 	flag_override(&mut settings.debug.profile, flags.profile);
 	flag_override(&mut settings.debug.monitor_mouse, flags.monitor_mouse);

@@ -9,6 +9,7 @@ pub(crate) struct ShaderPack {
 	pub lightmap_pipeline: LightmapPipeline,
 	pub normalmap_pipeline: NormalmapPipeline,
 	pub sph_pipeline: SphPipeline,
+	pub sph_shadows_pipeline: SphShadowPipeline,
 	pub entity_pipeline: EntityPipeline,
 	pub particles_pipeline: ParticlesPipeline,
 	pub debris_pipeline: ParticlesPipeline,
@@ -26,6 +27,7 @@ impl ShaderPack {
 		let lightmap_pipeline = LightmapPipeline::new(opts, &device, surface_format, &global_uniforms_layout);
 		let normalmap_pipeline = NormalmapPipeline::new(opts, &device, surface_format, &global_uniforms_layout);
 		let sph_pipeline = SphPipeline::new(opts, &device, surface_format, &global_uniforms_layout);
+		let sph_shadows_pipeline = SphShadowPipeline::new(opts, &device, surface_format, &global_uniforms_layout);
 		let entity_pipeline = EntityPipeline::new(opts, &device, surface_format, &global_uniforms_layout);
 		let particles_pipeline = ParticlesPipeline::new(opts, &device, surface_format, &global_uniforms_layout, true /* additive blend */);
 		let debris_pipeline = ParticlesPipeline::new(opts, &device, surface_format, &global_uniforms_layout, false /* additive blend */);
@@ -37,6 +39,7 @@ impl ShaderPack {
 			lightmap_pipeline,
 			normalmap_pipeline,
 			sph_pipeline,
+			sph_shadows_pipeline,
 			flat_texture_pipeline,
 			entity_pipeline,
 			animation_pipeline,
@@ -68,6 +71,10 @@ impl ShaderPack {
 
 	pub fn sph(&self, base_color: &Texture, sph: &[&Texture; 3], normalmap: &Texture, sun_mask: &Texture) -> Shader {
 		Shader::Sph(Arc::new(self.sph_pipeline.texture_bind_group(&self.device, base_color, sph, normalmap, sun_mask)))
+	}
+
+	pub fn sph_shadows(&self, base_color: &Texture, sph: &[&Texture; 3], normalmap: &Texture, sun_mask: &Texture) -> Shader {
+		Shader::SphShadows(Arc::new(self.sph_shadows_pipeline.texture_bind_group(&self.device, base_color, sph, normalmap, sun_mask)))
 	}
 
 	pub fn entity(&self, texture: &Texture, transform: mat4, bounding_box: &BoundingBox32, lightbox: &LightBox) -> Shader {

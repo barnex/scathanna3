@@ -21,16 +21,25 @@ pub(crate) struct GlobalsHostData {
 
 	sun_color: vec3,
 	_padding2: f32, // ☠️ be still, my wgpu.
+
+	shadow_centers: [[f32; 4]; 4],
+	// num_shadows?
 }
 
 impl GlobalsHostData {
-	pub fn from(camera: &Camera, viewport_size: uvec2, sun_dir: vec3, sun_color: vec3) -> Self {
+	pub fn from(camera: &Camera, viewport_size: uvec2, sun_dir: vec3, sun_color: vec3, shadow_centers: &[vec3]) -> Self {
 		debug_assert!(approx_eq(sun_dir.len(), 1.0));
+		let mut shadow_centerz: [[f32; 4]; 4] = default();
+		const OFF_MAP: vec3 = vec3(500.0, -500.0, 500.0);
+		for i in 0..shadow_centerz.len() {
+			shadow_centerz[i] = shadow_centers.get(i).copied().unwrap_or(OFF_MAP).append(1.0).into();
+		}
 		Self {
 			view_proj: camera.matrix(viewport_size),
 			cam_position: camera.position,
 			sun_dir,
 			sun_color,
+			shadow_centers: shadow_centerz,
 			_padding0: default(),
 			_padding1: default(),
 			_padding2: default(),

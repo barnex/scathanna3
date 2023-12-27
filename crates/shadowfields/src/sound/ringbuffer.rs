@@ -17,6 +17,13 @@ impl RingBuffer {
 		}
 	}
 
+	pub fn from_samples(samples: &[f32]) -> Self {
+		Self {
+			channels: [samples.to_vec(), samples.to_vec()],
+			cursor: 0,
+		}
+	}
+
 	pub fn play_raw_stereo_itl(&mut self, mut src: impl Iterator<Item = f32>) {
 		let mut cursor = self.cursor;
 		while let Some(mut sample) = src.next() {
@@ -36,10 +43,16 @@ impl RingBuffer {
 		}
 	}
 
-	pub fn next_sample(&mut self) -> (f32, f32) {
+	pub fn advance_and_erase(&mut self) -> (f32, f32) {
 		let sample = (self.channels[0][self.cursor], self.channels[1][self.cursor]);
 		self.channels[0][self.cursor] = 0.0;
 		self.channels[1][self.cursor] = 0.0;
+		self.cursor = self.advance(self.cursor);
+		sample
+	}
+
+	pub fn next_looping_sample(&mut self) -> (f32, f32) {
+		let sample = (self.channels[0][self.cursor], self.channels[1][self.cursor]);
 		self.cursor = self.advance(self.cursor);
 		sample
 	}

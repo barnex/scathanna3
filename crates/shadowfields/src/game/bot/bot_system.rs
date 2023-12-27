@@ -145,8 +145,8 @@ impl Bot {
 			.players
 			.values()
 			.filter(|p| p.spawned && p.id != me.id && p.team != me.team) // 👈 spawned enemy
-			.filter(|p| can_see(&state.map, me, p._center())) // 👈 visible
-			.min_by_key(|p| me._center().distance_to(p._center()) as i32) // 👈 closest
+			.filter(|p| can_see(&state.map, me, p.center())) // 👈 visible
+			.min_by_key(|p| me.center().distance_to(p.center()) as i32) // 👈 closest
 			.map(|p| p.id);
 	}
 
@@ -204,9 +204,9 @@ impl Bot {
 
 	fn find_enemy_waypoint(&mut self, state: &Client) -> Option<()> {
 		// TODO: clear if target player killed
-		let dst = state.entities.players.get(&self.engaging_enemy_id?)?._center();
+		let dst = state.entities.players.get(&self.engaging_enemy_id?)?.center();
 		const PERSONAL_SPACE: f32 = 2.0;
-		if state.local_player()._center().distance_to(dst) > PERSONAL_SPACE {
+		if state.local_player().center().distance_to(dst) > PERSONAL_SPACE {
 			self.waypoint = Some(dst);
 			self.waypoint_info = "target player";
 		}
@@ -220,7 +220,7 @@ impl Bot {
 			.props
 			.values()
 			.filter(|prop| can_see(&state.map, me, prop.center()))
-			.min_by_key(|prop| me._center().distance_to(prop.center()) as i32)
+			.min_by_key(|prop| me.center().distance_to(prop.center()) as i32)
 			.map(|prop| prop.center());
 		if self.waypoint.is_some() {
 			self.waypoint_info = "pickup";
@@ -240,7 +240,7 @@ impl Bot {
 	fn find_enemy_aimpoint(&mut self, state: &Client) {
 		if let Some(id) = self.engaging_enemy_id {
 			if let Some(enemy) = state.entities.players.get(&id) {
-				let enemy_pos = enemy._center();
+				let enemy_pos = enemy.center();
 				if can_see(&state.map, state.local_player(), enemy_pos) {
 					self.aimpoint = Some(enemy_pos);
 					self.aimpoint_info = "enemy";

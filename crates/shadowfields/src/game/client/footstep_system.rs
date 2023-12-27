@@ -10,16 +10,12 @@ pub(crate) fn animate_footsteps(state: &mut Client) {
 	for id in state.entities.spawned_player_ids() {
 		animate_footsteps_1(state, id);
 	}
-
-	/*
-		*/
-	//let curr = &self.entities.players[&player_id].local;
-	//self.make_footstep_sounds(eng, player_id, prev, curr);
 }
 
 fn animate_footsteps_1(state: &mut Client, id: ID) -> Option<()> {
 	let dt = state.dt();
 	let anim = state.entities.animation_state.entry(id).or_default();
+	let prev = anim.clone();
 	let player = state.entities.players.get(&id)?;
 
 	let walk_speed = player.skeleton.velocity;
@@ -37,18 +33,14 @@ fn animate_footsteps_1(state: &mut Client, id: ID) -> Option<()> {
 		anim.feet_phase = anim.feet_phase.clamp(-PI, PI);
 	}
 
-	// let target_pitch = if vspeed > 0.0 {
-	// 	-30.0 * DEG
-	// } else if vspeed < 0.0 {
-	// 	30.0 * DEG
-	// } else {
-	// 	0.0
-	// };
-	//let damp = FEET_ANIM_DAMP * dt;
-	//anim.feet_phase = (1.0 - damp) * anim.feet_phase;
+	let curr = anim.clone();
+	make_footstep_sounds(state, id, &prev, &curr);
 
 	Some(())
 }
+
+pub const OWN_FOOTSTEP_VOLUME: f32 = 0.015;
+pub const FOOTSTEP_VOLUME: f32 = 0.05;
 
 pub(crate) fn make_footstep_sounds(state: &mut Client, player_id: ID, prev: &AnimationState, curr: &AnimationState) {
 	let speed = state.entities.players[&player_id].skeleton.velocity;
@@ -59,7 +51,7 @@ pub(crate) fn make_footstep_sounds(state: &mut Client, player_id: ID, prev: &Ani
 		if prev.feet_phase.signum() != curr.feet_phase.signum() {
 			// make one's own footsteps less loud
 			// (quite distracting otherwise)
-			let volume = if player_id == state.local_player_id { 0.01 } else { 0.3 };
+			let volume = if player_id == state.local_player_id { OWN_FOOTSTEP_VOLUME } else { FOOTSTEP_VOLUME };
 			play_sound_spatial(
 				state,
 				random_footstep_clip(),
@@ -67,7 +59,8 @@ pub(crate) fn make_footstep_sounds(state: &mut Client, player_id: ID, prev: &Ani
 				&Spatial {
 					location: state.entities.players[&player_id].position(),
 				},
-			)
+			);
+			state.jump_sound_cooldown.reset();
 		}
 	}
 }

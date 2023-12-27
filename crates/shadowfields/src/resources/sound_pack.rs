@@ -9,8 +9,11 @@ type Clip = Vec<f32>;
 
 impl SoundPack {
 	pub fn new(config: &SoundOpts) -> Result<Self> {
+		// HACK
+		let music = config.music.then(|| decode_44khz_mono_f32(assets_dir().music_dir().join("felix1.ogg")).ok()).flatten();
+
 		let mixer = match config.enabled {
-			true => Some(Mixer::new(Duration::from_secs(10))?), // {
+			true => Some(Mixer::new(Duration::from_secs(10), music.as_deref())?), // {
 			false => None,
 		};
 		let slf = Self { mixer, clips: default() };

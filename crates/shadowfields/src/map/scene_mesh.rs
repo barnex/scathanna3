@@ -18,7 +18,7 @@ pub const SOURCES: &str = "sources";
 pub const SUN_MASK: &str = "sun_mask";
 pub const INDIRECT: &str = "indirect";
 
-pub(crate) fn upload_scene_mesh(map_dir: &MapDir, res: &mut Resources) -> Result<Vec<Object>> {
+pub(crate) fn upload_scene_mesh(map_dir: &MapDir, res: &mut Resources, settings: &GraphicsOpts) -> Result<Vec<Object>> {
 	let ctx = ctx();
 	let mut objects = vec![];
 
@@ -49,11 +49,12 @@ pub(crate) fn upload_scene_mesh(map_dir: &MapDir, res: &mut Resources) -> Result
 			};
 
 			// Choose fanciest material possible given the available mappings (normal map, spherical harmonics).
-			let material = match (normal_map, &sphxy) {
+			let material = match (normal_map, &sphxy, settings.shadows) {
 				//(None, _) => ctx.shader_pack.lightmap(&diffuse_color, &sphz),// 🪲 lightmap broken does not render sun becuase no normals
-				(None, _) => ctx.shader_pack.normalmap(&diffuse_color, &sphz, &default_normals, &sun_mask),
-				(Some(normal_map), None) => ctx.shader_pack.normalmap(&diffuse_color, &sphz, &normal_map, &sun_mask),
-				(Some(normal_map), Some((sphx, sphy))) => ctx.shader_pack.sph(&diffuse_color, &[&sphx, &sphy, &sphz], &normal_map, &sun_mask),
+				(None, _, _) => ctx.shader_pack.normalmap(&diffuse_color, &sphz, &default_normals, &sun_mask),
+				(Some(normal_map), None, _) => ctx.shader_pack.normalmap(&diffuse_color, &sphz, &normal_map, &sun_mask),
+				(Some(normal_map), Some((sphx, sphy)), false) => ctx.shader_pack.sph(&diffuse_color, &[&sphx, &sphy, &sphz], &normal_map, &sun_mask),
+				(Some(normal_map), Some((sphx, sphy)), true) => ctx.shader_pack.sph_shadows(&diffuse_color, &[&sphx, &sphy, &sphz], &normal_map, &sun_mask),
 			};
 
 			objects.push(Object::new(vao, material));

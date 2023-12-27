@@ -79,7 +79,7 @@ pub(crate) fn tick_health(state: &mut ServerState) {
 // count as a hit regardless of latency.
 // Otherwise players with more than about 30ms latency would be at a noticeable disadvantage.
 pub(crate) fn handle_hit_player(state: &mut ServerState, actor: ID, victim: ID) {
-	shoot_player(state, actor, victim, 100.0);
+	shoot_player(state, actor, victim, 110.0);
 }
 
 pub(crate) fn shoot_player(state: &mut ServerState, actor: ID, victim: ID, damage: f32) -> Option<()> {

@@ -117,6 +117,10 @@ impl AssetsDir {
 		self.0.join("audio")
 	}
 
+	pub fn music_dir(&self) -> PathBuf {
+		self.0.join("music")
+	}
+
 	pub fn materials_dir(&self, resolution: u32) -> PathBuf {
 		self.0.join("materials").join(resolution.to_string())
 	}

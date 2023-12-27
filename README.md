@@ -32,9 +32,9 @@ sudo apt install \
 Edit `settings.toml` for game client settings (controls, server address, player name, ...), and `server.toml` for server settings.
 
 
-
-
 ## Gallery
 
-
-![fig](shots/088-ferris_cove.jpg)
+![fig](shots/deck.jpeg)
+![fig](shots/castle_tower.jpeg)
+![fig](shots/castle2.jpeg)
+![fig](shots/ferris_cove.jpeg)

@@ -1,7 +1,7 @@
 use super::internal::*;
 
 pub(crate) fn smooth_players_movement(players: &mut HashMap<ID, Player>) {
-	let a = 0.3;
+	let a = 0.5;
 	for player in players.values_mut() {
 		player.skeleton.pre_filtered_position = a * player.skeleton.pre_filtered_position + (1.0 - a) * player.skeleton.target_position;
 		player.skeleton.filtered_position = a * player.skeleton.filtered_position + (1.0 - a) * player.skeleton.pre_filtered_position;
@@ -10,6 +10,7 @@ pub(crate) fn smooth_players_movement(players: &mut HashMap<ID, Player>) {
 
 /// Control a player via keyboard/mouse
 pub(crate) fn control_player_movement(state: &mut Client) {
+	state.jump_sound_cooldown.tick(state.dt());
 	let mut clone = state.local_player().clone();
 	control(state, &mut clone);
 	*state.local_player_mut() = clone;
@@ -97,7 +98,10 @@ pub(crate) fn unconditional_jump(player: &mut Player, jump_speed: f32) {
 fn tick_jump(state: &mut Client, player: &mut Player) {
 	if state.inputs().is_down(Button::Jump) {
 		if try_jump(player, state.world(), player.jump_speed) {
-			state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(handle("jump"), player.position(), 0.3)))
+			if state.jump_sound_cooldown.is_idle() {
+				state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(handle("jump"), player.position(), 0.3)));
+				state.jump_sound_cooldown.reset();
+			}
 		}
 	}
 }

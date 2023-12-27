@@ -32,6 +32,8 @@ pub(crate) struct Client {
 
 	pub mouse_filter: MouseFilter,
 
+	pub jump_sound_cooldown: Timer,
+
 	filtered_dt: f32,
 }
 
@@ -56,9 +58,10 @@ impl Client {
 		};
 		let (conn, acc) = with_loading_screen(&mut win, move || connect(server.as_str(), join_req)).await?;
 
-		let (res, map, zones, entities) = with_loading_screen(&mut win, || -> Result<_> {
+		let graphics = settings.graphics.clone();
+		let (res, map, zones, entities) = with_loading_screen(&mut win, move || -> Result<_> {
 			let mut res = Resources::new()?;
-			let (map, zones, entities) = load_state(&mut res, acc.map_switch)?;
+			let (map, zones, entities) = load_state(&mut res, acc.map_switch, &graphics)?;
 			Ok((res, map, zones, entities))
 		})
 		.await?;
@@ -88,6 +91,7 @@ impl Client {
 			sound_pack,
 			mouse_filter,
 			filtered_dt: 0.0,
+			jump_sound_cooldown: Timer::one_off_ready(0.25), // ensures we don't play footstep sound too often.
 		};
 
 		if client.settings.player.advantage {

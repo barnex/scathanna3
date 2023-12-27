@@ -57,6 +57,8 @@ mipmaps = true
 trilinear = true
 textures = true
 lightmap_nearest = false
+shadows = true
 
 [sound]
 enabled = true
+music = true

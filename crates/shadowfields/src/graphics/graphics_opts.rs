@@ -17,6 +17,13 @@ pub struct GraphicsOpts {
 	pub trilinear: bool,
 	pub lightmap_nearest: bool,
 	pub vsync: bool,
+	pub shadows: bool,
+	#[serde(default = "default_true")]
+	pub hud: bool,
+}
+
+fn default_true() -> bool {
+	true
 }
 
 impl GraphicsOpts {
@@ -63,6 +70,8 @@ impl Default for GraphicsOpts {
 			trilinear: false,
 			lightmap_nearest: false,
 			vsync: true,
+			shadows: true,
+			hud: true,
 		}
 	}
 }

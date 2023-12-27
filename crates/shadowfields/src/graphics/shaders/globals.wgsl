@@ -30,12 +30,17 @@ var<storage, read> instance_data: array<InstanceData>;
 fn lightbox_shader(lightbox: vec4f, base_color: vec3f, world_position: vec3f, normal: vec3f) -> vec4f {
     let sun_mask = lightbox.w;
 
-    let cos_theta = max(0.0, -dot(globals.sun_dir, normal));
-    let sun_diffuse = (sun_mask * cos_theta) * globals.sun_color;
+    let cos_theta_sun = max(0.0, -dot(globals.sun_dir, normal));
+    let sun_diffuse = (sun_mask * cos_theta_sun) * globals.sun_color;
 
     let sun_specular = (sun_mask * specular(globals.sun_dir, world_position, normal)) * vec3(globals.sun_color);
 
-    let ambient = lightbox.xzy;
+	// Add a little fake directionality to ambient,
+    // else object in the shadows appear extremely flat.
+    let base_ambient = lightbox.xzy;
+    let fake_ambient_dir = vec3f(0.3, 0.9, 0.0);
+    let ambient = base_ambient * 0.5*(1.0 + dot(normal, fake_ambient_dir));
+
     let color = (sun_diffuse + ambient) * base_color + sun_specular;
 
     return vec4(color, 1.0);

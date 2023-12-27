@@ -7,6 +7,7 @@ mod lightmap_pipeline;
 mod normalmap_pipeline;
 mod particles_pipeline;
 mod sph_pipeline;
+mod sph_shadow_pipeline;
 mod text_pipeline;
 
 pub(crate) use animation_pipeline::*;
@@ -16,4 +17,5 @@ pub(crate) use lightmap_pipeline::*;
 pub(crate) use normalmap_pipeline::*;
 pub(crate) use particles_pipeline::*;
 pub(crate) use sph_pipeline::*;
+pub(crate) use sph_shadow_pipeline::*;
 pub(crate) use text_pipeline::*;

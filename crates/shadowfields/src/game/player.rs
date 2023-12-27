@@ -45,7 +45,7 @@ impl Player {
 
 		// In games like UT, players can (single) jump slightly less than their own height.
 		// Jumps typically last ~600ms.
-		let jump_speed = jump_velocity_for_height(STD_GRAVITY, 0.8 * total_height);
+		let jump_speed = jump_velocity_for_height(STD_GRAVITY, 1.0 * total_height);
 
 		Self {
 			id,
@@ -93,7 +93,7 @@ impl Player {
 		self.skeleton.target_position - GROUND_PROBE_DIST * vec3::EY
 	}
 
-	pub fn _center(&self) -> vec3 {
+	pub fn center(&self) -> vec3 {
 		self.skeleton.filtered_bounds().center()
 	}
 

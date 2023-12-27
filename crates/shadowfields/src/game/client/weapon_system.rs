@@ -65,7 +65,7 @@ fn shoot(state: &mut Client, player: &Player) {
 
 	state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(
 		must_pick_random(&[handle("bang1"), handle("bang2"), handle("bang3"), handle("bang4")]),
-		player._center(),
+		player.center(),
 		30.0,
 	)));
 	state.pending_diffs.push(ClientMsg::PlaySound(SoundEffect::spatial(

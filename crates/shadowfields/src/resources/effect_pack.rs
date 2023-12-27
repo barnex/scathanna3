@@ -7,9 +7,9 @@ pub(crate) struct EffectPack {
 }
 
 /// Number of particles per unit of particle beam length.
-pub const PARTICLE_BEAM_DENSITY: u32 = 8;
+pub const PARTICLE_BEAM_DENSITY: u32 = 12;
 pub const PARTICLE_EXPLOSION_N: u32 = 1000;
-pub const DEBRIS_N: u32 = 100;
+pub const DEBRIS_N: u32 = 20;
 pub const PARTICLE_SCALE: f32 = 0.2;
 
 impl EffectPack {
@@ -43,7 +43,7 @@ impl EffectPack {
 			let rand = JITTER * uniform_disk(rand);
 			vec3(rand.x(), dist, rand.y())
 		};
-		let vel = |_| rand::thread_rng().gen_range(0.1..1.5);
+		let vel = |_| rand::thread_rng().gen_range(0.1..1.3);
 		Self::triangle_particles_vao(n, pos, vel, || rand::thread_rng().gen_range(PARTICLE_BEAM_TTL / 2.0..PARTICLE_BEAM_TTL))
 	}
 

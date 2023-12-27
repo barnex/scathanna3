@@ -146,7 +146,7 @@ impl Canvas {
 	fn render_to_surface(&mut self, sg: &SceneGraph, surface_tex: &wgpu::SurfaceTexture) {
 		// upload uniforms: camera, sky color, sun direction, etc.
 		let ctx = ctx();
-		ctx.upload_buffer(&self.global_uniforms.buffer, &[GlobalsHostData::from(&sg.camera, self.viewport_size(), sg.sun_dir, sg.sun_color)]);
+		ctx.upload_buffer(&self.global_uniforms.buffer, &[GlobalsHostData::from(&sg.camera, self.viewport_size(), sg.sun_dir, sg.sun_color, &sg.shadow_centers)]);
 
 		// upload instance data (transforms, light, ...) for all instanced shaders.
 		self.upload_instance_data(sg);
@@ -191,6 +191,10 @@ impl Canvas {
 					}
 					Sph(texture_bindings) => {
 						render_pass.set_pipeline(&shaders.sph_pipeline.pipeline);
+						render_pass.set_bind_group(0, texture_bindings, &[]);
+					}
+					SphShadows(texture_bindings) => {
+						render_pass.set_pipeline(&shaders.sph_shadows_pipeline.pipeline);
 						render_pass.set_bind_group(0, texture_bindings, &[]);
 					}
 					Entity(texture_bindings, _) => {
@@ -275,6 +279,7 @@ impl Canvas {
 				Lines(_) => (),
 				Lightmap(_) => (),
 				Sph(_) => (),
+				SphShadows(_) => (),
 				Normalmap(_) => (),
 				Text(_) => (),
 			}

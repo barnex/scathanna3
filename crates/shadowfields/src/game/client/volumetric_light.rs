@@ -37,13 +37,34 @@ impl VolumetricLight {
 
 /// xyz: ambient, w: sun factor
 fn sample_light_at(map: &Map, pos: vec3) -> vec4 {
-	let amb = 0.1; // <<<< TODO: proper ambient
+	let fake_ambient = vec4(0.2, 0.2, 0.10, 0.02);
+	sample_sun_at(map, pos) + sample_sky_at(map, pos) + fake_ambient
+}
+
+fn sample_sun_at(map: &Map, pos: vec3) -> vec4 {
 	let to_sun = -map.sun_dir;
 	let ray = Ray::new(pos, to_sun);
 	match map.intersect_t(&ray) {
-		None => vec4(amb, amb, amb, 1.0),
-		Some(_) => vec4(amb, amb, amb, 0.0),
+		None => vec4(0.0, 0.0, 0.0, 1.0),
+		Some(_) => vec4::ZERO,
 	}
+}
+
+fn sample_sky_at(map: &Map, pos: vec3) -> vec4 {
+	let mut acc = vec4::ZERO;
+
+	let mut n = 0;
+	for (dx, dz) in cross(-2..=2, -2..=2) {
+		n += 1;
+		let to_sky = vec3(dx as f32, 2.0, dz as f32).normalized();
+		let ray = Ray::new(pos, to_sky);
+		acc += match map.intersect_t(&ray) {
+			None => map.sky_color.append(0.0),
+			Some(_) => vec4::ZERO,
+		}
+	}
+
+	0.5 * acc / (n as f32)
 }
 
 fn key_for(pos: vec3) -> ivec3 {

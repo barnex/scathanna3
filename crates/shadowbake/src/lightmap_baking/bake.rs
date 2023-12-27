@@ -182,7 +182,7 @@ fn add(a: &HashMap<Handle, Img<Color>>, b: &HashMap<Handle, Img<Color>>) -> Hash
 }
 
 fn unweigh_lightmaps(sources: &HashMap<Handle, Img<Accum>>) -> HashMap<Handle, Img<Color>> {
-	sources.iter().map(|(&name, img)| (name, unweigh_or_black(img))).collect()
+	sources.iter().map(|(&name, img)| (name, _unweigh_or_black(img))).collect()
 }
 
 fn integrate<F>(scene: &Scene, sample: F) -> HashMap<Handle, Img<Accum>>

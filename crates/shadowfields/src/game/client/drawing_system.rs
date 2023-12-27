@@ -48,7 +48,9 @@ fn draw_skybox(sg: &mut SceneGraph, state: &Client) -> Option<()> {
 }
 
 fn draw_hud(sg: &mut SceneGraph, state: &Client) {
-	state.hud.draw_on(sg);
+	if state.settings.graphics.hud {
+		state.hud.draw_on(sg);
+	}
 }
 
 fn draw_axes(sg: &mut SceneGraph, res: &Resources) -> Option<()> {
@@ -151,7 +153,11 @@ fn draw_debris(sg: &mut SceneGraph, state: &Client, pos: vec3, normal: vec3, tex
 fn draw_particle_beam(sg: &mut SceneGraph, state: &Client, start: vec3, orientation: Orientation, len: f32, texture: Handle, ttl: f32) {
 	let ctx = ctx();
 
-	let time = PARTICLE_BEAM_TTL - ttl;
+	// nonlinear time effect looks more like confetti dampened by air drag.
+	let real_time = PARTICLE_BEAM_TTL - ttl;
+	let u = real_time / PARTICLE_BEAM_TTL;
+	let u = 0.3 * u + 0.7 * u.sqrt();
+	let fake_time = PARTICLE_BEAM_TTL * u;
 
 	let pitch_mat = pitch_matrix(-90.0 * DEG - orientation.pitch);
 	let yaw_mat = yaw_matrix(180.0 * DEG - orientation.yaw);
@@ -165,14 +171,14 @@ fn draw_particle_beam(sg: &mut SceneGraph, state: &Client, start: vec3, orientat
 	// how fast the head of the particle beam moves forward
 	let bullet_speed = 500.0; // m/s
 
-	let max_len = time * bullet_speed;
+	let max_len = real_time * bullet_speed;
 	let len = f32::min(len, max_len);
 
 	let n = 3 * (len as u32 + 1) * PARTICLE_BEAM_DENSITY;
 	let n = n.clamp(3, vao.num_indices); // TODO!
 
 	let texture = state.res.textures.load_or_default(texture);
-	let obj = Object::new(vao, ctx.shader_pack.particles(&texture, transf, time)).with(|o| o.index_range = Some(0..n));
+	let obj = Object::new(vao, ctx.shader_pack.particles(&texture, transf, fake_time)).with(|o| o.index_range = Some(0..n));
 
 	sg.push(obj);
 }
@@ -187,13 +193,19 @@ pub(crate) fn draw_line(sg: &mut SceneGraph, start: vec3, end: vec3) {
 fn draw_players(sg: &mut SceneGraph, state: &Client) {
 	for (_, player) in state.entities.players.iter().filter(|(_, p)| p.spawned) {
 		if player.id == state.local_player_id {
-			//draw_player_1st_person(rs, sg, world, player);
+			sg.shadow_centers.push(player.center());
+		//draw_player_1st_person(rs, sg, world, player);
 		} else {
-			//if camera.can_see(player.position()) {
-			draw_player_3d_person(sg, state, player);
-			//}
+			if state.local_player().camera().can_see(player.position()) {
+				draw_player_3d_person(sg, state, player);
+				draw_shadow(sg, state, player);
+			}
 		}
 	}
+}
+
+fn draw_shadow(sg: &mut SceneGraph, state: &Client, player: &Player) {
+	sg.shadow_centers.push(player.center());
 }
 
 fn draw_player_1st_person(rs: &Resources, sg: &mut SceneGraph, player: &Player) {

@@ -1,7 +1,7 @@
 use super::internal::*;
 
 pub(crate) fn switch_map(state: &mut Client, map_switch: MapSwitch) -> Result<()> {
-	let (map, zones, entities) = load_state(&mut state.res, map_switch)?;
+	let (map, zones, entities) = load_state(&mut state.res, map_switch, &state.settings.graphics)?;
 
 	state.map = map;
 	state.zones = zones;
@@ -21,12 +21,12 @@ pub(crate) fn switch_map(state: &mut Client, map_switch: MapSwitch) -> Result<()
 //	ui::loading_screen(win, move |_client| load_state(&mut res.lock().unwrap(), map_switch))
 //}
 
-pub(crate) fn load_state(res: &mut Resources, map_switch: MapSwitch) -> Result<(Map, Vec<Object>, Entities)> {
+pub(crate) fn load_state(res: &mut Resources, map_switch: MapSwitch, settings: &GraphicsOpts) -> Result<(Map, Vec<Object>, Entities)> {
 	let map_name = &map_switch.map_name;
 	let map_dir = assets_dir().find_map_dir(map_name);
 	let map = Map::load(&map_name)?;
 
-	let zones = upload_scene_mesh(&map_dir, res)?;
+	let zones = upload_scene_mesh(&map_dir, res, settings)?;
 
 	Ok((map, zones, map_switch.entities))
 }

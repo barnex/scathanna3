@@ -49,12 +49,12 @@ impl Load for Texture {
 pub fn parse_hex_color(color: &str) -> Result<vec3> {
 	let color = color.strip_prefix('#').unwrap_or(color);
 	if color.len() != 6 {
-		bail!("parse hex color `{color}`: need 6 characters")
+		bail!("parse hex colour `{color}`: need 6 characters")
 	}
-	let r = u8::from_str_radix(&color[0..2], 16)? as f32 / 255.0;
-	let g = u8::from_str_radix(&color[2..4], 16)? as f32 / 255.0;
-	let b = u8::from_str_radix(&color[4..6], 16)? as f32 / 255.0;
-	Ok(vec3(r, g, b))
+	let r = u8::from_str_radix(&color[0..2], 16)?;
+	let g = u8::from_str_radix(&color[2..4], 16)?;
+	let b = u8::from_str_radix(&color[4..6], 16)?;
+	Ok(Vector3::new(r, g, b).map(srgb_to_linear))
 }
 
 impl Load for Prop {

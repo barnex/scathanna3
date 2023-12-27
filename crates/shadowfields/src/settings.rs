@@ -85,11 +85,12 @@ pub struct PlayerOpts {
 #[serde(deny_unknown_fields)]
 pub struct SoundOpts {
 	pub enabled: bool,
+	pub music: bool,
 }
 
 impl Default for SoundOpts {
 	fn default() -> Self {
-		Self { enabled: true }
+		Self { enabled: true, music: false }
 	}
 }
 

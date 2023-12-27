@@ -23,7 +23,7 @@ pub(crate) struct Shell3 {
 
 impl Shell3 {
 	pub fn run(settings: Settings) -> Result<()> {
-		LOG.write(" >> Welcome to Scathanna 3.2 << ");
+		LOG.write(" >> Welcome to Scathanna 3.3 << ");
 
 		#[cfg(debug_assertions)]
 		LOG.write(DEBUG_WARNING);
@@ -38,7 +38,7 @@ impl Shell3 {
 				height: settings.graphics.height,
 			})
 			.with_fullscreen(settings.graphics.fullscreen.then(|| winit::window::Fullscreen::Borderless(None)))
-			.with_title("Scathanna 3.2")
+			.with_title("Scathanna 3.3")
 			.build(&event_loop)?;
 
 		let canvas = Canvas::new(&settings.graphics, &window)?;

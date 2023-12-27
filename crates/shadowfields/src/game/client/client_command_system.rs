@@ -17,6 +17,8 @@ pub(crate) fn exec_command(state: &mut Client, cmd: &str) -> Result<()> {
 		["fps_overlay" | "fps"] => flip(&mut state.debug.fps_overlay),
 		["ecs_overlay" | "ecs"] => flip(&mut state.debug.ecs_overlay),
 		["bb_overlay" | "bb"] => flip(&mut state.debug.bb_overlay),
+		["hud"] => flip(&mut state.settings.graphics.hud),
+		["hud", v] => Ok(state.settings.graphics.hud = v.parse()?),
 
 		["g" | "gravity", g] => set("gravity", &mut state.map.gravity, g),
 		["axes"] => flip(&mut state.debug.axes),

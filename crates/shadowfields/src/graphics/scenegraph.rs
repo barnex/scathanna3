@@ -11,6 +11,7 @@ pub(crate) struct SceneGraph {
 	pub camera: Camera,
 
 	pub objects: Vec<Object>,
+	pub shadow_centers: Vec<vec3>,
 }
 
 impl SceneGraph {
@@ -22,6 +23,7 @@ impl SceneGraph {
 			sun_dir: vec3(0.0, -1.0, 0.0),
 			camera: default(),
 			objects: default(),
+			shadow_centers: default(),
 		}
 	}
 

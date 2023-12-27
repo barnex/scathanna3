@@ -1,5 +1,15 @@
 addr = "127.0.0.1:3344"
 #addr = "192.168.0.122:3344"
-maplist = ["castle", "bevy_zero", "ferris_cove", "star_temple", "village", "deck", "pit", "tower2"]
+maplist = [
+	"castle",
+	"landscape",
+	"bevy_zero",
+	"ferris_cove",
+	"star_temple",
+	"village",
+	"deck",
+	"pit",
+	"tower2",
+]
 frag_limit = 32
 time_limit = 600

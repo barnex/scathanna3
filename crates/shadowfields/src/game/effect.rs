@@ -13,7 +13,7 @@ pub enum EffectType {
 	ParticleBeam { start: vec3, orientation: Orientation, len: f32, texture: Handle },
 }
 
-pub const PARTICLE_BEAM_TTL: f32 = 0.8; // seconds
+pub const PARTICLE_BEAM_TTL: f32 = 1.8; // seconds
 pub const PARTICLE_EXPLOSION_TTL: f32 = 1.8; // seconds
 pub const DEBRIS_TTL: f32 = 3.0; // seconds
 pub const RESPAWN_TTL: f32 = 1.5; // seconds
